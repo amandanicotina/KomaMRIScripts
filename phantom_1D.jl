@@ -30,7 +30,7 @@ struct MyPhantom
     Δw::Float64
 end
 
-s1 = MyPhantom("Phantom 1", -1.0, 1.0, 2, 1000*1e-3, 100*1e-3, 0.0)
+s1 = MyPhantom("Phantom 1", 0.0, 1.0, 1, 1000*1e-3, 100*1e-3, 10000.0)
 s2 = MyPhantom("Phantom 2", -1.0, 1.0, 2, 500*1e-3, 50*1e-3, 0.0) 
 
 single_line_phantom(p::MyPhantom) = begin
@@ -38,11 +38,13 @@ single_line_phantom(p::MyPhantom) = begin
     line = collect(Float64, p.x0:Δx:p.xf)    
     T1s = trues(length(line))*p.T1
     T2s = trues(length(line))*p.T2
-    phantom = Phantom(name=p.name, x = line, T1 = T1s, T2 = T2s) 
+    dw = p.Δw/p.N
+    Δws = 2π*collect(Float64,0:Δx:p.Δw)
+    phantom = Phantom(name=p.name, x = line, T1 = T1s, T2 = T2s, Δw = Δws) 
     return phantom
 end
 
-two_phantom_line(p1::MyPhantom, p2::MyPhantom)  = begin
+two_line_phantom(p1::MyPhantom, p2::MyPhantom)  = begin
     Δx = 1/p1.N
     line1 = collect(Float64, 0.0:0.5:10.0) 
     line2 = collect(Float64, 0.5:0.5:10.5) 
@@ -63,11 +65,9 @@ two_phantom_line(p1::MyPhantom, p2::MyPhantom)  = begin
     return phantom
 end
 
-obj = two_phantom_line(s1, s2)
-p1 = plot_phantom_map(obj, :T1; height = 400, darkmode=false)
-
-
-
+obj = single_line_phantom(s1)
+p2 = plot_phantom_map(obj, :Δw; height = 400, darkmode=false)
+#p3 = plot_phantom_map(obj, :Δw; height = 400, darkmode=false)
 
 
 
@@ -98,18 +98,7 @@ intercalate_phantom(p1::MyPhantom, p2::MyPhantom)  = begin
     return phantom
 end
 
-obj = intercalate_phantom(s1, s2)
-p1 = plot_phantom_map(obj, :T1; height = 400, darkmode=true)
 
-# MERGE PHANTOMS #
-#obj = Phantom{Float64}(name = s1.name*"+"*s2.name, 
- #       x  = [s1.x; s2.x], 
-  #      T1 = [s1.T1; s2.T1],
-   #     T2 = [s1.T2; s2.T2]
-    #    )
-
-# PLOTS #
-#p1 = plot_phantom_map(obj, :T1; height = 400, darkmode=true)
 
 
 

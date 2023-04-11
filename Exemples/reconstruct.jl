@@ -1,8 +1,5 @@
-# BRAIN PHANTOM #
-obj = brain_phantom2D()
-p1 = plot_phantom_map(obj, :T2; height=400)
-p2 = plot_phantom_map(obj, :Δw; height=400)
-
+# PHANTOM #
+p2 = plot_phantom_map(obj, :Δw; height = 400, darkmode=false)
 
 # EPI #
 seq_file = joinpath(dirname(pathof(KomaMRI)), "../examples/3.koma_paper/comparison_accuracy/sequences/EPI/epi_100x100_TE100_FOV230.seq")
@@ -26,3 +23,5 @@ image = reconstruction(acq, reconParams)
 # Plotting the recon
 slice_abs = abs.(image[:, :, 1])
 p5 = plot_image(slice_abs; height=400)
+
+p6 = plot_M0(seq)
