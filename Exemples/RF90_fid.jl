@@ -23,7 +23,7 @@ seq += aqc
 p1 = plot_seq(seq; slider = false, height = 300)
 
 # PHANTOM #
-obj = Phantom{Float64}(x = [0.], T1 = [1000e-3], T2 = [100e-3], Δw = [2π*100])
+obj = Phantom{Float64}(x = [0.], y = [0.2], T1 = [1000e-3], T2 = [100e-3])
 
 # SIMULATE #
 raw = simulate(obj, seq, sys)
