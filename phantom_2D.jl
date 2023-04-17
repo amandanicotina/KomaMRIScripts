@@ -19,25 +19,47 @@ struct MyPhantom2D
     Δw::Float64
 end
 
-s1_2d = MyPhantom2D("My phantom 2d", 
-        Position(0.0, 2.0, 2), 
-        Position(0.0, 2.0, 2), 
-        Relaxation(1000*1e-3, 100*1e-3), 0.0)
 
-square_phantom(p::MyPhantom2D) = begin
 
-    Δx = 1/p.x.N
-    Δy = 1/p.y.N
-    x_line = collect(Float64, p.x.p0:Δx:p.x.pf)
-    y_line = collect(Float64, p.y.p0:Δy:p.y.pf)
-    box = trues(length(x_line), length(y_line))
-    T1temp = box*p.relax.T1
-    T2temp = box*p.relax.T2
-    uxtemp(x::p, y::p) = begin trues(length(x_line), length(y_line)) end
-    phantom = Phantom(name=p.name, x=x_line, y=y_line, ux=uxtemp(p.x.pf, p.y.pf))
-    return phantom
+
+
+# x - y values.
+vec_x = collect(Float64, 0.0:1.0:10.0); 
+vec_y = collect(Float64, 0.0:1.0:10.0); 
+grid_x, grid_y = vec_x .+ vec_y'*0, vec_x*0 .+ vec_y';
+
+# x = [(x1); (x2); (x3); ...; (xn)]
+# y = [ (y1);
+    #   (y2); 
+    #    ...
+    #   (yn) ]
+
+
+# Transform it in abstract arrays
+Mx = SArray{Tuple{length(vec_x), length(vec_x)}, Float64}(grid_x);
+My = SArray{Tuple{length(vec_y), length(vec_y)}, Float64}(grid_y);
+x = vec(Mx);
+y = vec(My);
+#y = vec(transpose(Mx));
+
+
+# Create boolean matrix for T1 and T2 values
+grid_relax = falses(11,11);
+for i in eachindex(grid_relax)
+    if grid_relax[i] < 1 && > length(vec_x)
+        grid_relax[i] = true
+
+    end
 end
 
-obj2d = square_phantom(s1_2d)
+relax_vals = trues(2:length(vec_x)-1, 2:length(vec_x)-1) 
 
-p2 = plot_phantom_map(obj2d, :T1;  darkmode=true)
+# Transform it in abstract arrays
+#m = SArray{Tuple{5,5}, Float64}([0.0 0.0 0.0 0.0 0.0;0.0 1.0 0.0 1.0 0.0;0.0 0.0 0.0 0.0 0.0;0.0 1.0 0.0 1.0 0.0;0.0 0.0 0.0 0.0 0.0;]);
+Mrelax = SArray{Tuple{length(vec_x), length(vec_x)}, Float64}(grid_relax)
+T1 = vec(Mrelax*10);
+T2 = vec(Mrelax*5);
+
+# Create a 2D phantom
+obj = Phantom(name="ahh", x=x, y=y, T1=T1, T2=T2)
+p2 = plot_phantom_map(obj, :T1;  darkmode=false)
