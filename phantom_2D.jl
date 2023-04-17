@@ -23,7 +23,7 @@ end
 
 
 
-# x - y values.
+# x - y  grid values #
 vec_x = collect(Float64, 0.0:1.0:10.0); 
 vec_y = collect(Float64, 0.0:1.0:10.0); 
 grid_x, grid_y = vec_x .+ vec_y'*0, vec_x*0 .+ vec_y';
@@ -43,23 +43,29 @@ y = vec(My);
 #y = vec(transpose(Mx));
 
 
-# Create boolean matrix for T1 and T2 values
-grid_relax = falses(11,11);
-for i in eachindex(grid_relax)
-    if grid_relax[i] < 1 && > length(vec_x)
-        grid_relax[i] = true
+# Boolean matrix for T1 and T2 values #
+# Create a matrix with n rows and n columns, filled with zeros
+square = zeros(Int, length(vec_x), length(vec_x));
 
-    end
-end
+# Set the elements of the first and last rows to 1 to represent the top and bottom sides of the square
+top_bottom = 2;
+square[1:top_bottom,:] .= 1;
+square[end - top_bottom+1:end,:] .= 1;
 
-relax_vals = trues(2:length(vec_x)-1, 2:length(vec_x)-1) 
+# Set the elements of the first and last columns to 1 to represent the left and right sides of the square
+columns = 2
+square[:,1:columns] .= 1;
+square[:,end - columns+1:end] .= 1;
 
 # Transform it in abstract arrays
-#m = SArray{Tuple{5,5}, Float64}([0.0 0.0 0.0 0.0 0.0;0.0 1.0 0.0 1.0 0.0;0.0 0.0 0.0 0.0 0.0;0.0 1.0 0.0 1.0 0.0;0.0 0.0 0.0 0.0 0.0;]);
-Mrelax = SArray{Tuple{length(vec_x), length(vec_x)}, Float64}(grid_relax)
+Mrelax = SArray{Tuple{length(vec_x), length(vec_x)}, Float64}(square)
 T1 = vec(Mrelax*10);
 T2 = vec(Mrelax*5);
 
-# Create a 2D phantom
+
+# Create a 2D phantom #
 obj = Phantom(name="ahh", x=x, y=y, T1=T1, T2=T2)
 p2 = plot_phantom_map(obj, :T1;  darkmode=false)
+
+
+
