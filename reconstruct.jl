@@ -19,7 +19,7 @@ acq = AcquisitionData(raw);
 acq.traj[1].circular = false #This is to remove a circular mask
 
 # Setting up the reconstruction parameters
-Nx, Ny = [400 400]#raw.params["reconSize"][1:2];
+Nx, Ny = [500; 500];#raw.params["reconSize"][1:2];
 reconParams = Dict{Symbol,Any}(:reco=>"direct", :reconSize=>(Nx, Ny))
 image = reconstruction(acq, reconParams)
 
