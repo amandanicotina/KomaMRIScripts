@@ -23,7 +23,8 @@ seq += aqc
 p1 = plot_seq(seq; slider = false, height = 300)
 
 # PHANTOM #
-obj = Phantom{Float64}(x = [0.], T1 = [1000e-3], T2 = [100e-3])
+obj = Phantom{Float64}(x = [0.], T1 = [1000e-3], T2 = [100e-3],Δw=[-2π*100])
+p3 = plot_phantom_map(obj, :T1;  darkmode=false)
 
 # SIMULATE #
 raw = simulate(obj, seq, sys)
@@ -38,7 +39,7 @@ acq = AcquisitionData(raw);
 acq.traj[1].circular = false #This is to remove a circular mask
 
 # Setting up the reconstruction parameters
-Nx, Ny = [500; 500];#raw.params["reconSize"][1:2];
+Nx, Ny = raw.params["reconSize"][1:2];
 reconParams = Dict{Symbol,Any}(:reco=>"direct", :reconSize=>(Nx, Ny))
 image = reconstruction(acq, reconParams)
 
