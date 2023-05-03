@@ -33,15 +33,6 @@ obj = Phantom{Float64}(x = [0.], T1 = [1000e-3], T2 = [100e-3], Δw=[-2π*100])
 raw = simulate(obj, seq, sys)
 p2 = plot_signal(raw; slider = false, height = 300)
 p3 = plot_M0(seq)
-KomaMRICore/src/simulation/Bloch/BlochDictSimulationMethod.jl
-
-Base.view(Mag, [end]);
-
-@views Mag(M.xy[1], M.z[1]);
-
-
-
-
 
 # Define the initial magnetization values
 xy_initial = [1.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im]
@@ -65,3 +56,5 @@ end
 end
 
 test = mul!(spinor, M)
+
+
