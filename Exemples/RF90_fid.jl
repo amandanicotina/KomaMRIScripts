@@ -1,5 +1,5 @@
 using KomaMRI
-save_Mz=true
+
 
 # SCANNER #
 sys = Scanner()
