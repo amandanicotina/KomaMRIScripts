@@ -31,7 +31,14 @@ obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [1000e-3], T2 = [100e-3],�
 raw = simulate(obj, seq, sys)
 p2 = plot_signal(raw; slider = false, height = 300)
 
-
+sig = simulate(obj, seq, sys, simParams=Dict{String,Any}("return_type"=>"mat"))
+# Fourier Transform
+signal = sig[:,:,1];
+fourier = fft(signal);
+fieldTesla = sys.B0;
+fieldHz = (2π*γ)*fieldTesla;
+freq = LinRange(-fieldHz/2, fieldHz/2, 8192);
+plot(freq, abs.(fourier))
 
 # RECONSTRUCT #
 # Get the acquisition data
@@ -48,13 +55,3 @@ slice_abs = abs.(image[:, :, 1]);
 p5 = plot_image(slice_abs; height=400)
 
 
-
-
-p6 = plot_M0(seq; )
-
-signal = simulate(obj, seq, sys; simParams=Dict{String,Any}("sim_method"=>Bloch()));
-m = signal[:,1]
-plot(imag(m))
-ismrmrd = signal_to_raw_data(signal, seq; phantom_name ="spin1", sys);
-
-plot_signal(ismrmrd)
