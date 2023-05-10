@@ -1,0 +1,1 @@
+# Break RF pulse into tiny bits to track the magnetization throughout the rf pulse.
