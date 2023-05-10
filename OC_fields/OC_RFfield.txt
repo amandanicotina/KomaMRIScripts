@@ -1,0 +1,9 @@
+
+-> Script for saving OC pulses from Matlab
+
+b1x = final_controlFields(1,1).controlField/(2*pi);
+b1y = final_controlFields(1,2).controlField/(2*pi);
+b1 = b1x + 1j*b1y;
+t_s = final_controlFields(1,1).tf_s
+
+save('/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_fields/oc_field.mat', 'b1', 't_s')
