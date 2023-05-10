@@ -25,14 +25,7 @@ p1 = plot_seq(seq; slider=false, height=300)
 obj = Phantom{Float64}(x=[0.], T1=[1000e-3], T2=[100e-3])
 
 # SIMULATE #
-<<<<<<< HEAD
-raw = simulate(obj, seq, sys)
-=======
+
 raw = simulate(obj, seq, sys, simParams=Dict{String,Any}("return_type"=>"raw"))
 p2 = plot_signal(raw; slider = false, height = 300)
 
-
-
->>>>>>> testing
-
-p2 = plot_signal(raw; slider=false, height=300)
