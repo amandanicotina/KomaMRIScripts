@@ -40,16 +40,18 @@ seq += PulseDesigner.EPI(0.2, 10, sys)
 p1 = plot_seq(seq; slider = false, height = 300, max_rf_samples=Inf)
 
 # PHANTOM #
-obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [138e-3], T2 = [118e-3])
+obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [500e-3], T2 = [25e-3])
 #p3 = plot_phantom_map(obj, :T1;  darkmode=false)
 
 # SIMULATE #
 # Raw signal
-mag_signal = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"state"));
+# Raw signal
 raw = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"raw"));
+p3 = plot_signal(raw; slider = false, height = 300)
 #raw_ismrmrd = signal_to_raw_data(raw, seq);
-p2 = plot_signal(raw; slider = false, height = 300);
-p2
+signal = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"state"));
+Mt = signal.xy
+Mz = signal.z
 
 # RECONSTRUCT #
 # Get the acquisition data
