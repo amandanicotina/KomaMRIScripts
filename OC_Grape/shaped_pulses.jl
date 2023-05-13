@@ -5,6 +5,7 @@ sys = Scanner()
 
 # Importing MATLAB data
 RF_Hz = matread("/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat")["b1"];
+tf_sp = matread("/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat")["tf_s"];
 t_sp = matread("/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat")["t_s"];
 Mmax = matread("/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat")["Mmax"];
 Mmin = matread("/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat")["Mmin"];
@@ -14,7 +15,7 @@ Mmin = matread("/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC
 RF_T = RF_Hz/γ
 
 # 1st block -> RF block
-exc = RF(RF_T', t_sp);
+exc = RF(RF_T', tf_sp);
 
 # 2nd block -> ADC block
 nADC = 1 ;
@@ -31,7 +32,7 @@ seq += aqc
 p1 = plot_seq(seq; slider = false, height = 300, max_rf_samples=Inf)
     
 # PHANTOM #
-obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [50e-3], T2 = [25e-3]);
+obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [100e-3], T2 = [50e-3]);
 #p2 = plot_phantom_map(obj, :T1;  darkmode=false)
 
 # SIMULATE #
@@ -41,9 +42,9 @@ p2 = plot_signal(raw; slider = false, height = 300);
 
 signal = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"state"));
 Mx = real(signal.xy)[];
-My = real(signal.xy)[];
-Mz = real(signal.z)[];
-sig = "min"
+My = imag(signal.xy)[];
+Mz = signal.z[];
+sig = "max"
 
 # Fidelity
 if sig == "max"
