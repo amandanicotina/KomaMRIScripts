@@ -4,10 +4,11 @@
 b1x = final_controlFields(1,1).controlField/(2*pi);
 b1y = final_controlFields(1,2).controlField/(2*pi);
 b1 = b1x + 1j*b1y;
-t_s = final_controlFields(1,1).tf_s
+tf_s = final_controlFields(1,1).tf_s
+t_s = final_controlFields(1,1).t_s
 
 % Magnetisation
 Mmax = isoList(1, 1).M;
 Mmin = isoList(1, 2).M;
 
-save('/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat', 'b1', 't_s', 'Mmax', 'Mmin')
+save('/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat', 'b1', 'tf_s', 't_s', 'Mmax', 'Mmin')
