@@ -38,7 +38,7 @@ obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [100e-3], T2 = [50e-3]);
 # SIMULATE #
 # Raw signal
 raw = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"raw"));
-p2 = plot_signal(raw; slider = false, height = 300);
+p2 = plot_signal(raw; slider = false, height = 300)
 
 signal = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"state"));
 Mx = real(signal.xy)[];

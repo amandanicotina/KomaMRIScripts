@@ -1,5 +1,7 @@
 # Break RF pulse into tiny bits to track the magnetization throughout the rf pulse.
 using KomaMRI
+using Plots
+
 sys = Scanner()
 include("shaped_pulses.jl")
 
@@ -12,7 +14,7 @@ for i in 1:pieces
     t_block = t_sp[1, i*blocks]
 
     #1st block -> RF block
-    exc = RF(rf, t_block)
+    exc = RF(rf, t_block);
     
     # 2nd block -> ADC block
     nADC = 1 ;
@@ -21,9 +23,9 @@ for i in 1:pieces
     aqc = ADC(nADC, durADC)
     
     # concatenating the two blocks
-    seq1  = Sequence()
-    seq1 += exc
-    seq1 += aqc
+    seq1  = Sequence();
+    seq1 += exc;
+    seq1 += aqc;
     #p1 = plot_seq(seq1; slider = false, height = 300, max_rf_samples=Inf)
 
     # PHANTOM #
@@ -44,6 +46,7 @@ end
 t_evol = LinRange(0.0, tf_sp, Int(length(RF_T)+1))
 Mkoma = M_sp[2,:]';
 using Plots
+plotly()
 plot(t_evol, Mmin[3,:], line=:solid, marker=:circle, label = "OC Grape")
 plot!(t_koma', Mkoma', seriestype=:line, marker=:circle, label = "KomaMRI")
 #, seriestype=:scatter)
