@@ -1,161 +1,93 @@
-using KomaMRI, MAT, Plots
+using KomaMRI, MAT, Plots, WebIO
 
-# SCANNER
-sys = Scanner()
+oc_path = "/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/Notebook/oc_field.mat"
+function read_data(file_path)
+    mat_data = matread(file_path)
+    RF_Hz = mat_data["b1"]
+    tf_sp = mat_data["tf_s"]
+    t_sp = mat_data["t_s"]
+    Mmax = mat_data["Mmax"]
+    Mmin = mat_data["Mmin"]
+    return RF_Hz, tf_sp, t_sp, Mmax, Mmin
+end
+RF_Hz, tf_sp, t_sp, Mmax, Mmin = read_data(oc_path)
 
-# Importing MATLAB data
-file = open("oc_field.mat", "r")
+# convert to Tesla
+RF_T = RF_Hz/γ;
 
-t_sp = matread("oc_field.mat")["t_s"];
-Mmax = matread("oc_field.mat")["Mmax"];
-Mmin = matread("oc_field.mat")["Mmin"];
+# 1st block -> RF block
+exc = RF(RF_T', tf_sp);
 
-function rf_sequence!(file, Seq::Sequence)
-    # Reading MATLAB data
-    RF_Hz = matread("oc_field.mat")["b1"];
-    tf_sp = matread("oc_field.mat")["tf_s"];
-
-    # SEQUENCE
-    # convert to Tesla
-    RF_T = RF_Hz/γ;
-
-    # 1st block -> RF block
-    exc = RF(RF_T', tf_sp);
-
-    # 2nd block -> ADC block
-    nADC = 1 ;
-    durADC = 1e-4 ;
-    #delay = 1e-3 ;
+# 2nd block -> ADC block
+nADC = 1 ;
+durADC = 1e-3 ;
+function create_sequence(RF_T, tf_sp, nADC, durADC)
+    # RF block
+    exc = RF(RF_T', tf_sp)
+    
+    # ADC block
     aqc = ADC(nADC, durADC)
-
-    # concatenating the two blocks
-    seq  = Seq
+    
+    seq = Sequence()
     seq += exc
     seq += aqc
-
+    
     return seq
 end
 
-seq = rf_sequence!(file, Sequence())
+seq =  create_sequence(RF_T, tf_sp, nADC, durADC)
+obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [274e-3], T2 = [237e-3], Δw = [2π*7450]);
+sys = Scanner()
 
-# plot
-p1 = plot_seq(seq; slider = false, height = 300, max_rf_samples=Inf)
+function simulate_signal(obj, seq, sys)
+    signal = simulate(obj, seq, sys; simParams=Dict("return_type" => "state"))
+    Mx = real(signal.xy)[:]
+    My = imag(signal.xy)[:]
+    Mz = signal.z[:]
+    return Mx, My, Mz
+end
+
+Mx, My, Mz = simulate_signal(obj, seq, sys)
+
+function calculate_fidelity(Mx, My, Mz, Mref)
+    fidelity_Mx = round(abs(Mx - Mref[2, end])*100, digits=2)
+    fidelity_My = round(abs(My - Mref[3, end])*100, digits=2)
+    fidelity_Mz = round(abs(Mz - Mref[4, end])*100, digits=2)
+    return fidelity_Mx, fidelity_My, fidelity_Mz
+end
+
+function simulate_magnetization_dynamics(RF_T, t_sp, sys, nADC, durADC)
+    pieces = length(RF_T)
+    M_koma = zeros(Float64, 3, pieces)
+    t_koma = zeros(Float64, 1, pieces)
     
-# PHANTOM #
-obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [100e-3], T2 = [50e-3]);
-#p2 = plot_phantom_map(obj, :T1;  darkmode=false)
-
-pieces = 300; 
-
-function magnetization(seq::Sequence, obj::Phantom, file, pieces::Int)
-    # Empty arrays
-    M_koma = zeros(Float64, 3, pieces);
-    t_koma = zeros(1, pieces);
-
-    # SEQUENCE PIECES
-    #1st block -> RF block
-    exc = RF(rf, t_block);
-    
-    # 2nd block -> ADC block
-    nADC = 1 ;
-    durADC = 1e-3 ;
-    #delay = 1e-3 ;
-    aqc = ADC(nADC, durADC)
-        
-     # concatenating the two blocks
-    seq1  = Sequence();
-    seq1 += exc;
-    seq1 += aqc;
-
     for i in 1:pieces
-        blocks = Int(length(rf_tesla)/pieces);
-        rf_block = RF_T[1, 1:i*blocks] ;
-        t_block = t_sp[1, i*blocks];
+        blocks = Int(length(RF_T) / pieces)
+        rf_block = RF_T[1, 1:i*blocks]'
+        t_block = t_sp[1, i*blocks]
 
-        # SIMULATE #
-        signal1 = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"state"));
-    
-        # Magnetization
-        M_koma[1, i] = real(signal1.xy)[];
-        M_koma[2, i] = imag(signal1.xy)[];
-        M_koma[3, i] = signal1.z[];
-    
-        # Time
-        t_koma[1, i] = t_block;
-        return M_koma
+        seq1 = create_sequence(rf_block, t_block, nADC, durADC)
+
+        obj1 = Phantom{Float64}(name="spin1", x=[0.], T1=[100e-3], T2=[50e-3])
+
+        Mx, My, Mz = simulate_signal(obj1, seq1, sys)
+
+        M_koma[1, i] = Mx[]
+        M_koma[2, i] = My[]
+        M_koma[3, i] = Mz[]
+        t_koma[1, i] = t_block
     end
     
-    # Magnetization values
-    My_koma = M_koma[2,:]';
-    Mz_koma = M_koma[3,:]';
-    return M_koma, My_koma, Mz_koma
-end
-    
-    t_evol = LinRange(0.0, tf_sp, Int(length(RF_T)+1));
-    
-    
-    plotly();
-    p_mag = plot(t_evol, Mmax[4,:], line=:solid, marker=:circle, label = "OC Grape");
-    plot!(t_koma', Mz_koma', seriestype=:line, marker=:circle, label = "KomaMRI");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# SIMULATE #
-# Raw signal
-#raw = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"raw"));
-signal1 = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"state"));
-p2 = plot_signal(raw; slider = false, height = 300)
-
-
-signal = simulate(obj, seq, sys; simParams=Dict{String,Any}("return_type"=>"state"));
-Mx = real(signal.xy)[];
-My = imag(signal.xy)[];
-Mz = signal.z[];
-sig = "max"
-
-# Fidelity
-if sig == "max"
-    Mxmax = Mmax[2, end]
-    Mymax = Mmax[3, end]
-    Mzmax = Mmax[4, end]
-    fidelity_Mx = round(abs(Mx - Mxmax)*100, digits = 2)
-    fidelity_My = round(abs(My - Mymax)*100, digits = 2)
-    fidelity_Mz = round(abs(Mz - Mzmax)*100, digits = 2)
-else 
-    Mxmin = Mmin[2, end]
-    Mymin = Mmin[3, end]
-    Mzmin = Mmin[4, end]
-    fidelity_Mx = round(abs(Mx - Mxmin)*100, digits = 2)
-    fidelity_My = round(abs(My - Mymin)*100, digits = 2)
-    fidelity_Mz = round(abs(Mz - Mzmin)*100, digits = 2)
+    return M_koma[2, :], M_koma[3, :], t_koma'
 end
 
-println("Fidelity: Mx = $fidelity_Mx%, My = $fidelity_My%, Mz = $fidelity_Mz%")
-
-
-#################################################################
-# Breaking shaped pulse into pieces
-
+Mykoma, Mzkoma, tkoma = simulate_magnetization_dynamics(RF_T, t_sp, sys, nADC, durADC)
+size(Mzkoma)
+size(Mykoma)
+size(tkoma)
+function plot_results(t_evol, Mmax, t_koma, Mz_koma)
+    plotly()
+    plot(t_evol, Mmax[4, :], line=:solid, marker=:circle, label="OC Grape")
+    plot!(t_koma, Mz_koma, seriestype=:line, marker=:, label="KomaMRI")
+end
+plot_results(t_evol, Mmax,tkoma,  Mzkoma)
