@@ -76,6 +76,6 @@ end
 ## Plots
 function plot_results(t_evol, Mmax, t_koma, Mz_koma)
     plotly()
-    plot(t_evol, Mmax[4, :], line=:solid, marker=:circle, label="OC Grape")
-    plot!(t_koma, Mz_koma, seriestype=:line, marker=:, label="KomaMRI")
+    plot(t_evol, Mmin[3, :], line=:solid, marker=:circle, label="OC Grape")
+    plot!(t_koma, Mz_koma, seriestype=:line, marker=:circle, label="KomaMRI")
 end
