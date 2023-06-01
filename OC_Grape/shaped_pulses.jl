@@ -70,12 +70,48 @@ function simulate_magnetization_dynamics(RF_T, t_sp, sys, obj1, nADC, durADC)
         t_koma[1, i] = t_block
     end
     
-    return M_koma[2, :], M_koma[3, :], t_koma'
+    return M_koma, t_koma'
 end
 
 ## Plots
-function plot_results(t_evol, Mmax, t_koma, Mz_koma)
+function plot_results_max(t_evol, Mmax, t_koma, M_koma)
+    My_koma = M_koma[2, :]
+    Mz_koma = M_koma[3, :]
+
+    My_OC = Mmax[3, :]
+    Mz_OC = Mmax[4, :]
+
     plotly()
-    plot(t_evol, Mmin[3, :], line=:solid, marker=:circle, label="OC Grape")
-    plot!(t_koma, Mz_koma, seriestype=:line, marker=:circle, label="KomaMRI")
+    p1 = plot(t_evol, My_OC, line=:solid, marker=:circle, label="OC Grape")
+        plot!(t_koma, My_koma, seriestype=:line, marker=:circle, label="KomaMRI")
+
+    p2 = plot(t_evol, Mz_OC, line=:solid, marker=:circle, label="OC Grape")
+        plot!(t_koma, Mz_koma, seriestype=:line, marker=:circle, label="KomaMRI")
+
+    title!(p1, "Signal Maximized - My")
+    title!(p2, "Signal Maximized - Mz")
+
+    return p1, p2
 end
+
+
+function plot_results_min(t_evol, Mmin, t_koma, M_koma)
+    My_koma = M_koma[2, :]
+    Mz_koma = M_koma[3, :]
+
+    My_OC = Mmin[3, :]
+    Mz_OC = Mmin[4, :]
+
+    plotly()
+    p1 = plot(t_evol, My_OC, line=:solid, marker=:circle, label="OC Grape")
+        plot!(t_koma, My_koma, seriestype=:line, marker=:circle, label="KomaMRI")
+
+    p2 = plot(t_evol, Mz_OC, line=:solid, marker=:circle, label="OC Grape")
+        plot!(t_koma, Mz_koma, seriestype=:line, marker=:circle, label="KomaMRI")
+
+    title!(p1, "Signal Minimized - My")
+    title!(p2, "Signal Minimized - Mz")
+
+    return p1, p2
+end
+

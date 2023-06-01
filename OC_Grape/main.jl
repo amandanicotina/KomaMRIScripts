@@ -27,7 +27,7 @@ sys = Scanner();
 Mx, My, Mz = simulate_signal(obj, seq, sys);
 
 # Simulate magnetization
-Mykoma, Mzkoma, tkoma = 
+Mkoma, tkoma = 
 simulate_magnetization_dynamics(RF_T, t_sp, sys, obj, nADC, durADC);
 
 # Calculate fidelity
@@ -35,4 +35,8 @@ Fx, Fy, Fz = calculate_fidelity(Mx, My, Mz, Mmin)
 
 # Plots
 t_evol = LinRange(0.0, tf_sp, Int(length(RF_T)+1));
-plot_results(t_evol, Mmax, tkoma, Mzkoma)
+
+#plot_results_max(t_evol, Mmax, tkoma, Mkoma)
+p1, p2 = plot_results_min(t_evol, Mmin, tkoma, Mkoma);
+p1
+p2
