@@ -1,5 +1,6 @@
 using KomaMRI, MAT, Plots
 
+## Read MATLAB data
 function read_data(file_path)
     # MATLAB data
     mat_data = matread(file_path)
@@ -12,6 +13,7 @@ function read_data(file_path)
     return RF_Hz, tf_sp, t_sp, Mmax, Mmin
 end
 
+## Create Sequence
 function create_sequence(RF_T, tf_sp, nADC, durADC)
     # RF block
     exc = RF(RF_T', tf_sp)
@@ -27,6 +29,7 @@ function create_sequence(RF_T, tf_sp, nADC, durADC)
     return seq
 end
 
+## Simulate signal
 function simulate_signal(obj, seq, sys)
     signal = simulate(obj, seq, sys; simParams=Dict("return_type" => "state"))
     Mx = real(signal.xy)[:]
@@ -36,14 +39,7 @@ function simulate_signal(obj, seq, sys)
     return Mx, My, Mz
 end
 
-
-
-
-
-
-
-
-
+## Calculate fidelity
 function calculate_fidelity(Mx, My, Mz, Mref)
     fidelity_Mx = round(abs(Mx[] - Mref[2, end])*100, digits=2)
     fidelity_My = round(abs(My[] - Mref[3, end])*100, digits=2)
@@ -53,17 +49,7 @@ function calculate_fidelity(Mx, My, Mz, Mref)
 end
 
 
-
-Fx, Fy, Fz = calculate_fidelity(Mx, My, Mz, Mmax)
-
-
-
-
-
-
-
-
-
+## Simulate magnetization dynamics
 function simulate_magnetization_dynamics(RF_T, t_sp, sys, obj1, nADC, durADC)
     pieces = length(RF_T)
     M_koma = zeros(Float64, 3, pieces)
@@ -87,6 +73,7 @@ function simulate_magnetization_dynamics(RF_T, t_sp, sys, obj1, nADC, durADC)
     return M_koma[2, :], M_koma[3, :], t_koma'
 end
 
+## Plots
 function plot_results(t_evol, Mmax, t_koma, Mz_koma)
     plotly()
     plot(t_evol, Mmax[4, :], line=:solid, marker=:circle, label="OC Grape")
