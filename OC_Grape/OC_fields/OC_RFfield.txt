@@ -12,3 +12,6 @@ Mmax = isoList(1, 1).M;
 Mmin = isoList(1, 2).M;
 
 save('/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat', 'b1', 'tf_s', 't_s', 'Mmax', 'Mmin')
+
+
+save('/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat', 'b1', 'tf_s', 't_s', 'Mmax', 'Mmin')
