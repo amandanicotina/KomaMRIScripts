@@ -41,9 +41,9 @@ end
 
 ## Calculate fidelity
 function calculate_fidelity(Mx, My, Mz, Mref)
-    fidelity_Mx = round(abs(Mx[] - Mref[2, end])*100, digits=2)
-    fidelity_My = round(abs(My[] - Mref[3, end])*100, digits=2)
-    fidelity_Mz = round(abs(Mz[] - Mref[4, end])*100, digits=2)
+    fidelity_Mx = round(abs(Mx[] - Mref[2, end-1])*100, digits=2)
+    fidelity_My = round(abs(My[] - Mref[3, end-1])*100, digits=2)
+    fidelity_Mz = round(abs(Mz[] - Mref[4, end-1])*100, digits=2)
 
     return fidelity_Mx, fidelity_My, fidelity_Mz
 end

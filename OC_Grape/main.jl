@@ -31,7 +31,8 @@ Mkoma, tkoma =
 simulate_magnetization_dynamics(RF_T, t_sp, sys, obj, nADC, durADC);
 
 # Calculate fidelity
-Fx, Fy, Fz = calculate_fidelity(Mx, My, Mz, Mmin)
+Fx, Fy, Fz = calculate_fidelity(Mx, My, Mz, Mmin);
+println("$Fx, $Fy, $Fz")
 
 # Plots
 t_evol = LinRange(0.0, tf_sp, Int(length(RF_T)+1));
