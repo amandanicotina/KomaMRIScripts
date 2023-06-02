@@ -88,8 +88,13 @@ function plot_results_max(t_evol, Mmax, t_koma, M_koma)
     p2 = plot(t_evol, Mz_OC, line=:solid, marker=:circle, label="OC Grape")
         plot!(t_koma, Mz_koma, seriestype=:line, marker=:circle, label="KomaMRI")
 
-    title!(p1, "Signal Maximized - My")
-    title!(p2, "Signal Maximized - Mz")
+    xaxis!(p1, "t [sec]")
+    yaxis!(p1, "My")
+    title!(p1, "Target: Maximize")
+    
+    xaxis!(p2, "t [sec]")
+    yaxis!(p2, "Mz")
+    title!(p2, "Target: Maximize")
 
     return p1, p2
 end
@@ -108,9 +113,13 @@ function plot_results_min(t_evol, Mmin, t_koma, M_koma)
 
     p2 = plot(t_evol, Mz_OC, line=:solid, marker=:circle, label="OC Grape")
         plot!(t_koma, Mz_koma, seriestype=:line, marker=:circle, label="KomaMRI")
+    xaxis!(p1, "t [sec]")
+    yaxis!(p1, "My")
+    title!(p1, "Target: Minimize")
 
-    title!(p1, "Signal Minimized - My")
-    title!(p2, "Signal Minimized - Mz")
+    xaxis!(p2, "t [sec]")
+    yaxis!(p2, "Mz")
+    title!(p2, "Target: Minimize")
 
     return p1, p2
 end
