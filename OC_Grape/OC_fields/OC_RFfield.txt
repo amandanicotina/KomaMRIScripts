@@ -8,8 +8,8 @@ tf_s = final_controlFields(1,1).tf_s
 t_s = final_controlFields(1,1).t_s
 
 % Magnetisation
-Mmax = isoList(1, 1).M;
-Mmin = isoList(1, 2).M;
+Mmax = isoList(1, 21).M;
+Mmin = isoList(1, 22).M;
 
 save('/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat', 'b1', 'tf_s', 't_s', 'Mmax', 'Mmin')
 

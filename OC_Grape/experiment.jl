@@ -1,4 +1,4 @@
-using KomaMRI, MAT, Plots
+#using KomaMRI, MAT, Plots
 
 ## Read MATLAB data
 function read_data(file_path)

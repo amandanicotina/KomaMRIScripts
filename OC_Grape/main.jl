@@ -1,5 +1,6 @@
+using KomaMRI, MAT, Plots
 
-include("shaped_pulses.jl")
+include("experiment.jl")
 
 ## Matlab data
 oc_path = "/Users/amandanicotina/Documents/Julia/Projects/KomaMRIScripts/OC_Grape/OC_fields/oc_field.mat"
@@ -20,7 +21,9 @@ seq = create_sequence(RF_T, tf_sp, nADC, durADC);
 p1 = plot_seq(seq; slider = false, height = 300, max_rf_samples=Inf)
 
 ## Phantom and Scanner
-obj = Phantom{Float64}(name = "spin1", x = [0.], T1 = [100e-3], T2 = [50e-3]);
+#B0_Hz = sys.B0 / γ
+obj = Phantom{Float64}(name = "spin1", x = [0.0067e-3], T1 = [50e-3], T2 = [25e-3]);
+p = plot_phantom_map(obj, :Δw; height=400)
 sys = Scanner();
 
 ## Simulate signal
@@ -31,13 +34,17 @@ Mkoma, tkoma =
 simulate_magnetization_dynamics(RF_T, t_sp, sys, obj, nADC, durADC);
 
 # Calculate fidelity
-Fx, Fy, Fz = calculate_fidelity(Mx, My, Mz, Mmin);
+Fx, Fy, Fz = calculate_fidelity(Mx, My, Mz, Mmax);
 println("$Fx, $Fy, $Fz")
 
 # Plots
 t_evol = LinRange(0.0, tf_sp, Int(length(RF_T)+1));
 
 #plot_results_max(t_evol, Mmax, tkoma, Mkoma)
-p1, p2 = plot_results_min(t_evol, Mmin, tkoma, Mkoma);
+p1, p2 = plot_results_max(t_evol, Mmax, tkoma, Mkoma);
 p1
 p2
+
+
+
+
