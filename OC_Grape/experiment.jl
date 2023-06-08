@@ -16,7 +16,7 @@ end
 ## Create Sequence
 function create_sequence(RF_T, tf_sp, nADC, durADC)
     # RF block
-    exc = RF(RF_T', tf_sp)
+    exc = RF(RF_T, tf_sp)
     
     # ADC block
     aqc = ADC(nADC, durADC)
@@ -56,9 +56,8 @@ function simulate_magnetization_dynamics(RF_T, t_sp, sys, obj1, nADC, durADC)
     t_koma = zeros(Float64, 1, pieces)
     
     for i in 1:pieces
-        blocks = Int(length(RF_T) / pieces)
-        rf_block = RF_T[1, 1:i*blocks]'
-        t_block = t_sp[1, i*blocks]
+        rf_block = RF_T[1, 1:i]
+        t_block = t_sp[1, i]
 
         seq1 = create_sequence(rf_block, t_block, nADC, durADC)
 
