@@ -1,6 +1,5 @@
 
 
-
 rf_koma = seq.RF[2].A;
 rf_oc = RF_T';
 size(rf_koma)

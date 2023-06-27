@@ -1,20 +1,27 @@
 #using KomaMRI, MAT, Plots
 
 ## Read MATLAB data
-function read_data(file_path)
-    # MATLAB data
+function read_data(file_path::String)
     mat_data = matread(file_path)
-    RF_Hz = mat_data["b1"]
-    tf_sp = mat_data["tf_s"]
-    t_sp = mat_data["t_s"]
-    Mmax = mat_data["Mmax"]
-    Mmin = mat_data["Mmin"]
 
-    return RF_Hz, tf_sp, t_sp, Mmax, Mmin
+    RF_Hz  = mat_data["b1"]
+    tf_rf  = mat_data["tf_s"]
+    t_rf   = mat_data["t_s"]
+    Mmax   = mat_data["Mmax"]
+    T1_max = mat_data["T1_max"]
+    T2_max = mat_data["T2_max"]
+    Mmin   = mat_data["Mmin"]
+    T1_min = mat_data["T1_min"]
+    T2_min = mat_data["T2_min"]
+    freq_vals = mat_data["freq_array"]
+    pos_vals  = mat_data["pos_array"]
+
+    return RF_Hz, tf_rf, t_rf, Mmax, T1_max, 
+        T2_max, Mmin, T1_min, T2_min, freq_vals, pos_vals
 end
 
 ## Create Sequence
-function create_sequence(RF_T, tf_sp, nADC, durADC)
+function create_sequence(RF_T::Vector{Float64}, tf_sp::Float64, nADC::Int, durADC::Float64)
     # RF block
     exc = RF(RF_T, tf_sp)
     
@@ -27,6 +34,11 @@ function create_sequence(RF_T, tf_sp, nADC, durADC)
     seq += aqc
     
     return seq
+end
+
+## Spins 
+function get_spins(name::String, )
+    
 end
 
 ## Simulate signal
@@ -56,7 +68,7 @@ function simulate_magnetization_dynamics(RF_T, t_sp, sys, obj1, nADC, durADC)
     t_koma = zeros(Float64, 1, pieces)
     
     for i in 1:pieces
-        rf_block = RF_T[1, 1:i]
+        rf_block = RF_T[1:i, 1]
         t_block = t_sp[1, i]
 
         seq1 = create_sequence(rf_block, t_block, nADC, durADC)
